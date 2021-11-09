@@ -5,5 +5,48 @@
 {% endblock %}
 
 {% block container %}
-    <h1 class="met-5">@{{  request.user.username }}</h1>
+    <div class="row justify-content-md-center">
+        <div class="col-6 p-4">
+            <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <p class="alert alert-danger">{{  form.errors }}</p>
+                {% endif %}
+                <div class="media">
+                    {% load static %}
+                    
+                    {% if profile.picture  %}
+                        <img src="{{ profile.picture.url }}" class="rounded-circle" height="40" />
+                    {% else %}
+                        <img src="{% static 'img/default-profile.png' %}" class="rounded-circle" height="40" />
+                    {% endif %}
+
+
+                    <div class="media-body">
+                        <h5 class="ml-4">@{{ user.username }} | {{ user.get_full_name }}</h5>
+                        <p class="ml-4"><input type="file" name="picture" /></p>
+                    </div>
+                </div>
+
+                <hr><br>
+
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="url" class="form-control" name="website" placeholder="Website" value="{{ profile.website }}" />
+                </div>
+                <div class="form-group">
+                    <label>Biography</label>
+                    <textarea name="biography" class="form-control">{{ profile.biography }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Phone number</label>
+                    <input type="text" class="form-control" name="phone_number" placeholder="Phone number" value="{{ profile.phone_number }}" />
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-5">Update info</button>
+            </form>
+        </div>
+    </div>
+
 {% endblock %}
