@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from users.models import Profile
 
 #Forms
-from users.forms import ProfileForm
+from users.forms import ProfileForm, SignupForm
 
 
 def login_view(request):
@@ -62,31 +62,44 @@ def update_profile(request):
 # Create your views here.
 
 def signup(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        passwd = request.POST['passwd']
-        passwd_confirmation = request.POST['passwd_confirmation']
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = SignupForm()
+    return render(
+        request= request,
+        template_name='users/signup.html',
+        context={'form':form}
+    )
+    #Last form validation - Not recommend validation in views
+    # if request.method == 'POST':
+    #     username = request.POST['username']
+    #     passwd = request.POST['passwd']
+    #     passwd_confirmation = request.POST['passwd_confirmation']
+    #
+    #     if passwd != passwd_confirmation:
+    #         return render(request, 'users/signup.html', {'error': 'Passwords does not match'})
+    #
+    #     #Here the user is created
+    #     try:
+    #         user = User.objects.create_user(username=username, password=passwd)
+    #     except IntegrityError:
+    #         return render(request, 'users/signup.html', {'error': 'This username already exists'})
+    #     #After, we add the other data
+    #     user.first_name = request.POST['first_name']
+    #     user.last_name = request.POST['last_name']
+    #     user.email = request.POST['email']
+    #     user.save()
+    #
+    #     profile = Profile(user=user)
+    #     profile.save() #If we don't user Profile.object.Create_user, we need to put save in another line
+    #
+    #     return redirect('login')
 
-        if passwd != passwd_confirmation:
-            return render(request, 'users/signup.html', {'error': 'Passwords does not match'})
-
-        #Here the user is created
-        try:
-            user = User.objects.create_user(username=username, password=passwd)
-        except IntegrityError:
-            return render(request, 'users/signup.html', {'error': 'This username already exists'})
-        #After, we add the other data
-        user.first_name = request.POST['first_name']
-        user.last_name = request.POST['last_name']
-        user.email = request.POST['email']
-        user.save()
-
-        profile = Profile(user=user)
-        profile.save() #If we don't user Profile.object.Create_user, we need to put save in another line
-
-        return redirect('login')
-
-    return render(request, 'users/signup.html')
+    #return render(request, 'users/signup.html')
 
 @login_required()
 def logout_view(request):
