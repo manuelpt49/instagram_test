@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 from platzigram.views import hello_world, say_hi, sortedIntegers
 from posts import views as posts_views
@@ -28,11 +30,15 @@ urlpatterns = [
     path('sorted/', sortedIntegers, name='sort'),
     path('hi/<str:name>/<int:age>/', say_hi, name='hi'),
 
-    path('', posts_views.list_posts, name='feed'),#Path from posts app - folder created
-    path('posts/new', posts_views.create_post, name='create_post'),
+    path('', include(('posts.urls', 'posts'), namespace='posts')),
+    #Zipping all routes in file url.py in posts folder
+    #path('', posts_views.list_posts, name='feed'),#Path from posts app - folder created
+    #path('posts/new', posts_views.create_post, name='create_post'),
 
-    path('users/login', users_views.login_view, name='login'),
-    path('users/logout', users_views.logout_view, name='logout'),
-    path('users/signup', users_views.signup, name='signup'),
-    path('users/me/profile', users_views.update_profile, name='update_profile')
-]
+    path('users/', include(('users.urls', 'users'), namespace='users')),
+    #Zipping all routes in file url.py in users folder
+    #path('users/login', users_views.login_view, name='login'),
+    #path('users/logout', users_views.logout_view, name='logout'),
+    #path('users/signup', users_views.signup, name='signup'),
+    #path('users/me/profile', users_views.update_profile, name='update_profile')
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
